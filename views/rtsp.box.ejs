@@ -1,0 +1,43 @@
+<script src="/hooks/rtsp/jsmpeg.min.js"></script>
+<div class="box box-primary" data-ng-controller="RtspBoxCtrl as vm" ng-init="vm.init(<%= boxId %>);">
+    <div class="box-header with-border">
+        <i class="fa fa-camera"></i>
+        <h3 class="box-title">
+            <%= __('box-camera-title') %>
+        </h3>
+        <i class="close fa fa-gear" data-toggle="collapse" href="#rtsp_url" aria-expanded="true"></i>
+    </div>
+    <div id="rtsp_url" class="panel-collapse collapse" aria-expanded="true">
+        <div class="box-body">
+            <form class="form-horizontal"></form>
+
+            <div class="form-group">
+                <label for="serverUrl" class="col-sm-3 control-label">Server URL</label>
+
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="serverUrl" placeholder="server URL"
+                        ng-model="vm.serverUrl">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="cameraUrl" class="col-sm-3 control-label">Camera URL</label>
+
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="cameraUrl" placeholder="camera URL" ng-model="vm.cameraUrl">
+                </div>
+            </div>
+            </form>
+
+        </div>
+        <div class="box-footer">
+            <button type="submit" class="btn btn-info pull-right btn-flat" data-toggle="collapse"
+                ng-click="vm.saveCameraUrl(vm.cameraUrl, vm.serverUrl);"><%= __('box-camera-validate') %></button>
+        </div>
+    </div>
+    <div class="box-body ng-cloak">
+        <div id="div-video-canvas" style="background-color: #111;text-align: center;" ng-show="vm.enterUrl === false"
+            class="ng-cloak">
+            <canvas id="video-canvas"></canvas>
+        </div>
+    </div>
+</div>
