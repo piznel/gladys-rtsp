@@ -6,34 +6,42 @@
         .module('gladys')
         .controller('RtspBoxCtrl', RtspBoxCtrl);
 
-    RtspBoxCtrl.$inject = ['boxService', 'userService'];
+    RtspBoxCtrl.$inject = ['boxService', 'userService', '$scope'];
 
-    function RtspBoxCtrl(boxService, userService) {
+    function RtspBoxCtrl(boxService, userService, $scope) {
         /* jshint validthis: true */
         var vm = this;
 
         vm.box = null;
         vm.saveCameraUrl = saveCameraUrl;
         vm.cameraUrl = null;
-        vm.serverUrl = null;
+        vm.serverIp = null;
+        vm.serverPort = null;
         vm.init = init;
-        var player;
+        vm.player;
+        vm.quality = 5;
 
+        var width = 0;
         var client;
+        var server = '';
 
-        addEventListener('load', load, false);
+        //addEventListener('load', load, false);
 
-        function load(){
-            if(!vm.enterUrl) {
-                var container = document.getElementById("div-video-canvas");
-                var width = container.clientWidth % 2 === 1 ? container.clientWidth - 1 : container.clientWidth
-                var canvas = document.getElementById('video-canvas');
-                client = new WebSocket(vm.cameraUrl);
+        $scope.$watch('$viewContentLoaded', function () {
+            load()
+        })
 
-                client.onopen = function () {
-                    client.send('{"width":' + width + ', "url":"' + vm.cameraUrl + '"}')
-                    player = new JSMpeg.Player(vm.serverUrl, { canvas: canvas, poster:'../img/wait_gd.gif' });
-                }
+        function load() {
+            var container = document.getElementById("div-video-canvas");
+            width = container.clientWidth % 2 === 1 ? container.clientWidth - 21 : container.clientWidth - 20
+        }
+
+        function connect() {
+            var canvas = document.getElementById('video-canvas');
+            client = new WebSocket(server);
+            client.onopen = function () {
+                client.send('{"width":' + width + ', "url":"' + server + '" , "quality":"' + vm.quality + '"}')
+                vm.player = new JSMpeg.Player(server, { canvas: canvas, poster: '../img/wait_gd.gif' });
             }
         }
 
@@ -42,10 +50,15 @@
             boxService.getById(id)
                 .then(function (data) {
                     vm.box = data.data;
-                    if (vm.box.params && vm.box.params.cameraUrl && vm.box.params.serverUrl) {
+                    console.log(vm.box)
+                    if (vm.box.params && vm.box.params.cameraUrl && vm.box.params.serverIp && vm.box.params.serverPort && vm.box.params.quality) {
                         vm.enterUrl = false;
                         vm.cameraUrl = vm.box.params.cameraUrl;
-                        vm.serverUrl = vm.box.params.serverUrl;
+                        vm.serverIp = vm.box.params.serverIp;
+                        vm.serverPort = vm.box.params.serverPort;
+                        vm.quality = vm.box.params.quality;
+                        server = 'wss://' + vm.serverIp + ':' + vm.serverPort + '/'
+                        connect()
 
                     } else {
                         vm.enterUrl = true;
@@ -53,13 +66,17 @@
                 });
         }
 
-        function saveCameraUrl(cameraUrl, serverUrl ) {
-            boxService.update(vm.boxId, { params: { serverUrl: serverUrl, cameraUrl:cameraUrl } })
-                .then(function (data) {
-                    vm.enterUrl = false;
-                    vm.cameraUrl = url;
-                    load()
-                });
+        function saveCameraUrl(cameraUrl, serverIp, serverPort, quality) {
+            if (cameraUrl && serverIp && serverPort && quality) {
+                boxService.update(vm.boxId, { params: { serverIp: serverIp, cameraUrl: cameraUrl, serverPort: serverPort, quality: quality } })
+                    .then(function (data) {
+                        vm.enterUrl = false;
+                        if (vm.player) vm.player.destroy()
+                        if (client) client.close();
+                        connect()
+                    });
+            }
+
         }
     }
 })();

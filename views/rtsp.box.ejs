@@ -1,4 +1,4 @@
-<script src="/hooks/rtsp/jsmpeg.min.js"></script>
+<script src="/hooks/rtsp/js/jsmpeg.min.js"></script>
 <div class="box box-primary" data-ng-controller="RtspBoxCtrl as vm" ng-init="vm.init(<%= boxId %>);">
     <div class="box-header with-border">
         <i class="fa fa-camera"></i>
@@ -9,34 +9,42 @@
     </div>
     <div id="rtsp_url" class="panel-collapse collapse" aria-expanded="true">
         <div class="box-body">
-            <form class="form-horizontal"></form>
-
-            <div class="form-group">
-                <label for="serverUrl" class="col-sm-3 control-label">Server URL</label>
-
-                <div class="col-sm-9">
-                    <input type="text" class="form-control" id="serverUrl" placeholder="server URL"
-                        ng-model="vm.serverUrl">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="serverIp" class="col-sm-2 control-label">Server IP</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="serverIp" placeholder="192.168.1.33"
+                            ng-model="vm.serverIp">
+                    </div>
+                    <label for="serverPort" class="col-sm-2 control-label">Server Port</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="serverPort" placeholder="8082"
+                            ng-model="vm.serverPort">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="cameraUrl" class="col-sm-3 control-label">Camera URL</label>
+                <div class="form-group">
+                    <label for="cameraUrl" class="col-sm-2 control-label">Camera URL</label>
 
-                <div class="col-sm-9">
-                    <input type="text" class="form-control" id="cameraUrl" placeholder="camera URL" ng-model="vm.cameraUrl">
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="cameraUrl" placeholder="rtsp://192.168.1.30/onvif1"
+                            ng-model="vm.cameraUrl">
+                    </div>
+                    <label for="quality" class="col-sm-2 control-label">quality</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="quality" placeholder="5" ng-model="vm.quality">
+                    </div>
                 </div>
-            </div>
             </form>
-
         </div>
         <div class="box-footer">
-            <button type="submit" class="btn btn-info pull-right btn-flat" data-toggle="collapse"
-                ng-click="vm.saveCameraUrl(vm.cameraUrl, vm.serverUrl);"><%= __('box-camera-validate') %></button>
+            <button type="submit" class="btn btn-info pull-right btn-flat" data-toggle="collapse" href="#rtsp_url"
+                ng-click="vm.saveCameraUrl(vm.cameraUrl, vm.serverIp, vm.serverPort, vm.quality);"><%= __('box-camera-validate') %></button>
         </div>
     </div>
     <div class="box-body ng-cloak">
-        <div id="div-video-canvas" style="background-color: #111;text-align: center;" ng-show="vm.enterUrl === false"
-            class="ng-cloak">
+        <div id="div-video-canvas" element-resize style="background-color: #111;text-align: center;padding:10px"
+            ng-show="vm.enterUrl === false" class="ng-cloak" on-load-callback="vm.load()" ng-loading="customer"
+            ng-loading-not-found="Customer not found!">
             <canvas id="video-canvas"></canvas>
         </div>
     </div>
