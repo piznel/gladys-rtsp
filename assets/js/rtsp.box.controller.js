@@ -50,14 +50,13 @@
             boxService.getById(id)
                 .then(function (data) {
                     vm.box = data.data;
-                    console.log(vm.box)
                     if (vm.box.params && vm.box.params.cameraUrl && vm.box.params.serverIp && vm.box.params.serverPort && vm.box.params.quality) {
                         vm.enterUrl = false;
                         vm.cameraUrl = vm.box.params.cameraUrl;
                         vm.serverIp = vm.box.params.serverIp;
                         vm.serverPort = vm.box.params.serverPort;
                         vm.quality = vm.box.params.quality;
-                        server = 'wss://' + vm.serverIp + ':' + vm.serverPort + '/'
+                        server = 'wss://' + vm.serverIp + ':' + vm.serverPort + '/';
                         connect()
 
                     } else {
@@ -67,16 +66,15 @@
         }
 
         function saveCameraUrl(cameraUrl, serverIp, serverPort, quality) {
-            if (cameraUrl && serverIp && serverPort && quality) {
-                boxService.update(vm.boxId, { params: { serverIp: serverIp, cameraUrl: cameraUrl, serverPort: serverPort, quality: quality } })
-                    .then(function (data) {
-                        vm.enterUrl = false;
-                        if (vm.player) vm.player.destroy()
-                        if (client) client.close();
-                        connect()
-                    });
-            }
+            server = server = 'wss://' + serverIp + ':' + serverPort + '/';
+            boxService.update(vm.boxId, { params: { serverIp: serverIp, cameraUrl: cameraUrl, serverPort: serverPort, quality: quality } })
+                .then(function (data) {
+                    vm.enterUrl = false;
+                    if (vm.player) vm.player.destroy()
+                    if (client) client.close();
 
+                    connect()
+                });
         }
     }
 })();
