@@ -40,7 +40,7 @@
             var canvas = document.getElementById('video-canvas');
             client = new WebSocket(server);
             client.onopen = function () {
-                client.send('{"width":' + width + ', "url":"' + server + '" , "quality":"' + vm.quality + '"}')
+                client.send('{"width":' + width + ', "url":"' + vm.cameraUrl + '" , "quality":"' + vm.quality + '"}')
                 vm.player = new JSMpeg.Player(server, { canvas: canvas, poster: '../img/wait_gd.gif' });
             }
         }
